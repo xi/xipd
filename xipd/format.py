@@ -60,6 +60,17 @@ def autoformat(pd):
 	return apply_positions(pd, positions)
 
 
+def try_autoformat(pd):
+	try:
+		return autoformat(pd)
+	except FileNotFoundError:
+		print(
+			f'WARNING: {DOT_CMD} could not be found. Formatting is disabled.',
+			file=sys.stderr,
+		)
+		return pd
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument(

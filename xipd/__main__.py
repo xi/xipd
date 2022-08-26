@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from .renderer import Renderer
-from .format import autoformat
+from .format import try_autoformat
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
 
 	renderer = Renderer()
 	output = renderer.render(args.infile)
-	output = autoformat(output)
+	output = try_autoformat(output)
 	print(output, end='')
 
 

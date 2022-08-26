@@ -90,7 +90,8 @@ class Parser:
 
 	def parse_expr(self, s):
 		return self.parse_any(s, [
-			self.parse_op,
+			self.parse_op_add,
+			self.parse_op_mult,
 			self.parse_expr_no_op,
 		])
 
@@ -100,10 +101,22 @@ class Parser:
 		_, s = self.parse_re(s, r'\)')
 		return expr, s
 
-	def parse_op(self, s):
-		left, s = self.parse_expr_no_op(s)
-		op, s = self.parse_re(s, r' *(\+|-|\*|/)~? *')
+	def parse_op_add(self, s):
+		left, s = self.parse_any(s, [
+			self.parse_op_mult,
+			self.parse_expr_no_op,
+		])
+		op, s = self.parse_re(s, r' *(\+|-)~? *')
 		right, s = self.parse_expr(s)
+		return ('op', op.strip(), left, right), s
+
+	def parse_op_mult(self, s):
+		left, s = self.parse_expr_no_op(s)
+		op, s = self.parse_re(s, r' *(\*|/)~? *')
+		right, s = self.parse_any(s, [
+			self.parse_op_mult,
+			self.parse_expr_no_op,
+		])
 		return ('op', op.strip(), left, right), s
 
 	def parse_assign(self, s):

@@ -6,17 +6,8 @@ from .parser import Parser
 class Scope:
 	def __init__(self, parent=None):
 		self.parent = parent
-		self._node_count = 0
 		self._refs = {}
 		self._funcs = {}
-
-	@property
-	def root(self):
-		return self.parent.root if self.parent else self
-
-	def create_node(self):
-		self.root._node_count += 1
-		return self.root._node_count - 1
 
 	def add_ref(self, name, ref):
 		self._refs[name] = ref
@@ -46,8 +37,12 @@ class Renderer:
 	def __init__(self):
 		self.parser = Parser()
 
+	def create_node(self):
+		self.node_count += 1
+		return self.node_count - 1
+
 	def _print(self, s):
-		print('#%s;' % s, end='\r\n')
+		self.output += f'#{s};\r\n'
 
 	def call(self, name, args, scope):
 		params, body, lexical_scope = scope.get_func(name)
@@ -80,11 +75,11 @@ class Renderer:
 			return index, port
 		elif expr[0] == 'raw':
 			self._print(f'X obj 0 0 {expr[1]}')
-			index = scope.create_node()
+			index = self.create_node()
 			return index, 0
 		elif expr[0] in ['str', 'int', 'float']:
 			self._print(f'X msg 0 0 {expr[1]}')
-			index = scope.create_node()
+			index = self.create_node()
 			self._print('X connect %i %i %i %i' % (
 				*scope.get_ref('!loadbang'),
 				index, 0
@@ -120,6 +115,9 @@ class Renderer:
 
 	def render(self, fh):
 		scope = Scope()
+		self.node_count = 0
+		self.output = ''
+
 		ast = self.parser.parse_file(fh)
 		self._print('N canvas')
 		self.render_with_scope([
@@ -127,8 +125,10 @@ class Renderer:
 		], scope)
 		self.render_with_scope(ast, scope)
 
+		return self.output
+
 
 if __name__ == '__main__':
 	renderer = Renderer()
 	with open(sys.argv[1]) as fh:
-		renderer.render(fh)
+		print(renderer.render(fh), end='')

@@ -1,4 +1,12 @@
+import os
+
 from .parser import Parser
+
+
+def abspath(path, start):
+	dir = os.path.dirname(start)
+	joined = os.path.join(dir, path)
+	return os.path.normpath(joined)
 
 
 class Scope:
@@ -43,14 +51,14 @@ class Renderer:
 		self.output += f'#{s};\r\n'
 
 	def call(self, name, args, scope):
-		params, body, lexical_scope = scope.get_func(name)
+		params, body, path, lexical_scope = scope.get_func(name)
 		if len(args) != len(params):
 			raise SyntaxError(f'wrong number of argumtnes for function {name}')
 
 		subscope = Scope(lexical_scope)
 		for param, arg in zip(params, args):
 			subscope.add_ref(param, self.expr_to_ref(arg, scope))
-		value = self.render_with_scope(body, subscope)
+		value = self.render_with_scope(body, subscope, path)
 		if value is None:
 			raise SyntaxError(f'missing return in function {name}')
 		return value
@@ -86,12 +94,13 @@ class Renderer:
 		else:
 			raise SyntaxError('invalid expression', expr)
 
-	def render_with_scope(self, ast, scope):
+	def render_with_scope(self, ast, scope, path):
 		for stmt in ast:
 			if stmt[0] == 'include':
-				with open(stmt[1]) as fh:
+				_path = abspath(stmt[1], path)
+				with open(_path) as fh:
 					ast = self.parser.parse_file(fh)
-				self.render_with_scope(ast, scope)
+				self.render_with_scope(ast, scope, _path)
 			elif stmt[0] == 'return':
 				_, expr = stmt
 				return self.expr_to_ref(expr, scope)
@@ -107,7 +116,7 @@ class Renderer:
 				scope.add_ref(name, ref)
 			elif stmt[0] == 'func':
 				_, name, params, body = stmt
-				scope.add_func(name, (params, body))
+				scope.add_func(name, (params, body, path))
 			else:
 				raise SyntaxError('invalid statement', stmt)
 
@@ -120,7 +129,7 @@ class Renderer:
 		self._print('N canvas')
 		self.render_with_scope([
 			('assign', '!loadbang', ('raw', 'loadbang'))
-		], scope)
-		self.render_with_scope(ast, scope)
+		], scope, None)
+		self.render_with_scope(ast, scope, fh.name)
 
 		return self.output

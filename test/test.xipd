@@ -1,0 +1,10 @@
+include "../std.xipd"
+
+osc(node, freq) {
+	freq -> node
+	return node
+}
+
+osc1 = osc(`osc~`, 1)
+osc2 = osc(`phasor~`, osc1 *~ 20 +~ 440)
+osc2 -> `dac~`

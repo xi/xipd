@@ -1,4 +1,4 @@
-include "../std.xipd"
+include "std.xipd"
 
 osc(node, freq) {
 	freq -> node

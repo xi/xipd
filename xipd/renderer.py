@@ -9,6 +9,14 @@ def abspath(path, start):
 	return os.path.normpath(joined)
 
 
+def find_include(path, start):
+	p = abspath(path, start)
+	if os.path.exists(p):
+		return p
+	else:
+		return abspath(path, __file__)
+
+
 class Scope:
 	def __init__(self, parent=None):
 		self.parent = parent
@@ -97,7 +105,7 @@ class Renderer:
 	def render_with_scope(self, ast, scope, path):
 		for stmt in ast:
 			if stmt[0] == 'include':
-				_path = abspath(stmt[1], path)
+				_path = find_include(stmt[1], path)
 				with open(_path) as fh:
 					ast = self.parser.parse_file(fh)
 				self.render_with_scope(ast, scope, _path)

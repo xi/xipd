@@ -1,5 +1,6 @@
 import re
 import sys
+import argparse
 import subprocess
 
 DOT_CMD = 'dot'
@@ -59,7 +60,15 @@ def autoformat(pd):
 	return apply_positions(pd, positions)
 
 
-if __name__ == '__main__':
-	with open(sys.argv[1]) as fh:
-		pd = fh.read()
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument(
+		'infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
+	)
+	args = parser.parse_args()
+	pd = args.infile.read()
 	print(autoformat(pd), end='')
+
+
+if __name__ == '__main__':
+	main()

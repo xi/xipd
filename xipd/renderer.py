@@ -1,5 +1,3 @@
-import sys
-
 from .parser import Parser
 
 
@@ -126,9 +124,3 @@ class Renderer:
 		self.render_with_scope(ast, scope)
 
 		return self.output
-
-
-if __name__ == '__main__':
-	renderer = Renderer()
-	with open(sys.argv[1]) as fh:
-		print(renderer.render(fh), end='')

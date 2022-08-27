@@ -1,5 +1,4 @@
 import re
-import sys
 
 
 class SyntaxError(TypeError):
@@ -181,12 +180,3 @@ class Parser:
 		if not len(stack) == 1:
 			raise SyntaxError('unbalanced blocks')
 		return stack[0]
-
-
-if __name__ == '__main__':
-	parser = Parser()
-	with open(sys.argv[1]) as fh:
-		ast = parser.parse_file(fh)
-
-	from pprint import pprint
-	pprint(ast)

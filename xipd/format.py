@@ -28,7 +28,7 @@ def parse_dot(dot):
 	positions = {}
 	dot = dot.replace(',\n', ', ')
 	for line in dot.splitlines():
-		m = re.match(r'\s*([0-9]+).*pos="([0-9]+),([0-9]+)"', line)
+		m = re.match(r'\s*([0-9]+).*pos="([0-9.]+),([0-9.]+)"', line)
 		if m:
 			i = int(m.group(1))
 			x = float(m.group(2))

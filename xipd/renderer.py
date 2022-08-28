@@ -61,7 +61,7 @@ class Renderer:
 	def call(self, name, args, scope):
 		params, body, path, lexical_scope = scope.get_func(name)
 		if len(args) != len(params):
-			raise SyntaxError(f'wrong number of argumtnes for function {name}')
+			raise SyntaxError(f'wrong number of arguments for function {name}')
 
 		subscope = Scope(lexical_scope)
 		for param, arg in zip(params, args):

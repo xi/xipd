@@ -20,3 +20,22 @@ pow(a, b) {
 max(a, b) {
 	return op(`max`, a, b)
 }
+
+bng(foo) {
+	bng = `bng`
+	foo -> bng
+	return bng
+}
+
+delay(bng, msec) {
+	delay = `delay`
+	bng -> delay:0
+	msec -> delay:1
+	return delay
+}
+
+note_to_freq(note) {
+	freq = `expr pow(2\, ($f1 - 69) / 12) * 440`
+	note -> freq
+	return freq
+}

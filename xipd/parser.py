@@ -196,6 +196,7 @@ class Parser:
 			self.parse_assign,
 			self.parse_startfunc,
 			self.parse_endfunc,
+			self.parse_expr,
 		], parse_to_end=True)
 		return ast
 

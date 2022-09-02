@@ -126,7 +126,7 @@ class Renderer:
 				_, name, params, body = stmt
 				scope.add_func(name, (params, body, path))
 			else:
-				raise SyntaxError('invalid statement', stmt)
+				self.expr_to_ref(stmt, scope)
 
 	def render(self, fh):
 		scope = Scope()

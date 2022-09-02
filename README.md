@@ -108,6 +108,9 @@ of the following patterns:
 -   **Return**: Each function must return an expression. This should be the
     last statement of the function because no further statements are executed.
     (e.g. `return foo:1`)
+-   **Expression**: Sometimes it is useful to have expressions (especially
+    function calls) without assigning them to a name, just for their side
+    effects.
 
 ## Low-level language
 

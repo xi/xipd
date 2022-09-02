@@ -1,5 +1,17 @@
 import re
 
+# https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
+OPERATORS = [
+	('*~', 12),
+	('*', 12),
+	('/~', 12),
+	('/', 12),
+	('+~', 11),
+	('+', 11),
+	('-~', 11),
+	('-', 11),
+]
+
 
 class SyntaxError(TypeError):
 	pass
@@ -87,36 +99,59 @@ class Parser:
 			self.parse_raw,
 		])
 
-	def parse_expr(self, s):
-		return self.parse_any(s, [
-			self.parse_op_add,
-			self.parse_op_mult,
-			self.parse_expr_no_op,
-		])
-
 	def parse_parens(self, s):
 		_, s = self.parse_re(s, r'\(')
 		expr, s = self.parse_expr(s)
 		_, s = self.parse_re(s, r'\)')
 		return expr, s
 
-	def parse_op_add(self, s):
-		left, s = self.parse_any(s, [
-			self.parse_op_mult,
-			self.parse_expr_no_op,
-		])
-		op, s = self.parse_re(s, r' *(\+|-)~? *')
-		right, s = self.parse_expr(s)
-		return ('op', op.strip(), left, right), s
+	def parse_op(self, s):
+		s = s.lstrip()
+		for op, precedence in OPERATORS:
+			if s.startswith(op):
+				s = s[len(op):].lstrip()
+				return (op, precedence), s
+		else:
+			raise SyntaxError
 
-	def parse_op_mult(self, s):
-		left, s = self.parse_expr_no_op(s)
-		op, s = self.parse_re(s, r' *(\*|/)~? *')
-		right, s = self.parse_any(s, [
-			self.parse_op_mult,
-			self.parse_expr_no_op,
-		])
-		return ('op', op.strip(), left, right), s
+	def _apply_operator_precedence(self, ops, exprs):
+		expr_stack = [exprs[0]]
+		op_stack = []
+
+		def pop():
+			op, _ = op_stack.pop()
+			rhs = expr_stack.pop()
+			lhs = expr_stack.pop()
+			expr_stack.append(('op', op, lhs, rhs))
+
+		for i, op in enumerate(ops):
+			while op_stack and op_stack[-1][1] >= op[1]:
+				pop()
+			op_stack.append(op)
+			expr_stack.append(exprs[i + 1])
+
+		while op_stack:
+			pop()
+
+		assert len(expr_stack) == 1
+		return expr_stack[0]
+
+	def parse_expr(self, s):
+		expr, s = self.parse_expr_no_op(s)
+		exprs = [expr]
+		ops = []
+
+		while True:
+			try:
+				op, s_tmp = self.parse_op(s)
+				expr, s_tmp = self.parse_expr_no_op(s_tmp)
+				ops.append(op)
+				exprs.append(expr)
+				s = s_tmp
+			except SyntaxError:
+				break
+
+		return self._apply_operator_precedence(ops, exprs), s
 
 	def parse_assign(self, s):
 		name, s = self.parse_name(s)

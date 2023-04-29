@@ -102,7 +102,7 @@ of the following patterns:
 -   **Assignment**: Assign an expression to a name (e.g. `foo = 1`)
 -   **Connection**: Create a connection between two nodes. (e.g. ``foo:1 ->
     `dac~` ``)
--   **Include**: Include code from another file (e.g. `include "../foo.xirb"`)
+-   **Include**: Include code from another file (e.g. `include "../foo.xipd"`)
 -   **Start a function**: (e.g. `foo(a, b) {`)
 -   **End a function**: Each function must end with `}`
 -   **Return**: Each function must return an expression. This should be the

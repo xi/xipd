@@ -183,6 +183,11 @@ class Parser:
 		path, s = self.parse_str(s)
 		return ('include', path[1]), s
 
+	def parse_array(self, s):
+		_, s = self.parse_re(s, r'array *')
+		name, s = self.parse_str(s)
+		return ('array', name[1]), s
+
 	def parse_return(self, s):
 		_, s = self.parse_re(s, r'return *')
 		expr, s = self.parse_expr(s)
@@ -191,6 +196,7 @@ class Parser:
 	def parse_line(self, s):
 		ast, s = self.parse_any(s, [
 			self.parse_include,
+			self.parse_array,
 			self.parse_return,
 			self.parse_connect,
 			self.parse_assign,

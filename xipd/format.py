@@ -20,6 +20,8 @@ def pd2dot(pd):
 		elif line.startswith('#X obj') or line.startswith('#X msg'):
 			out.append(f'  {index};')
 			index += 1
+		elif line.startswith('#X array'):
+			index += 1
 	out.append('}')
 	return '\n'.join(out)
 
@@ -49,6 +51,8 @@ def apply_positions(pd, positions):
 			lines.append(' '.join(parts))
 			index += 1
 		else:
+			if line.startswith('#X array'):
+				index += 1
 			lines.append(line)
 	return ''.join(l + '\r\n' for l in lines)
 

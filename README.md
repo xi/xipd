@@ -103,6 +103,8 @@ of the following patterns:
 -   **Connection**: Create a connection between two nodes. (e.g. ``foo:1 ->
     `dac~` ``)
 -   **Include**: Include code from another file (e.g. `include "../foo.xipd"`)
+-   **Array**: Create a named array that can store data, e.g. samples (e.g.
+    `array "mysample"`)
 -   **Start a function**: (e.g. `foo(a, b) {`)
 -   **End a function**: Each function must end with `}`
 -   **Return**: Each function must return an expression. This should be the

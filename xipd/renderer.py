@@ -109,6 +109,9 @@ class Renderer:
 				with open(_path) as fh:
 					ast = self.parser.parse_file(fh)
 				self.render_with_scope(ast, scope, _path)
+			elif stmt[0] == 'array':
+				self._print(f'X array {stmt[1]} 0 float')
+				self.create_node()
 			elif stmt[0] == 'return':
 				_, expr = stmt
 				return self.expr_to_ref(expr, scope)
